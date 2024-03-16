@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <style>
+        .login-form {
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Login</h1>
+        <form class="login-form" method="POST">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.username.label }}<br>
+                {{ form.username }}<br>
+            </div>
+            <div class="form-group">
+                {{ form.password.label }}<br>
+                {{ form.password }}<br>
+            </div>
+            <div class="form-group form-check">
+                {{ form.remember() }}
+                <label class="form-check-label">
+                    Lembrar-me
+                </label>
+            </div>
+            {{ form.submit() }}
+        </form>
+        {% if form.errors %}
+            <ul class="alert alert-danger">
+                {% for error in form.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p class="text-center">Não tem uma conta? <a href="{{ url_for('register') }}">Registre-se aqui</a>.</p>
+    </div>
+</body>
+</html>
