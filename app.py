@@ -41,8 +41,11 @@ class Dish(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String(255), nullable=True)
     available = db.Column(db.Boolean, nullable=False, default=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    submenu_id = db.Column(db.Integer, db.ForeignKey('submenu.id'))
+submenu = db.relationship('submenu', backref='submenu_dishes', lazy=True)
 
 class RegisterForm(FlaskForm):
     username = StringField('Nome de usuário')
@@ -50,9 +53,11 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField('Confirmar senha')
     submit = SubmitField('Registrar')
 
-class sub_menu(db.Model):
+class submenu(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    dishes = db.relationship('Dish', backref='submenu', lazy=True)
+
 
 # Define a função de carregamento do usuário
 @login_manager.user_loader
@@ -73,13 +78,11 @@ with app.app_context():
 @app.route('/')
 @app.route('/home')
 def index():
-    restaurants = Restaurant.query.all()
-    if not restaurants:
+    restaurant = Restaurant.query.first()
+    if not restaurant:
         return 'Nenhum restaurante encontrado.'
-    menu_items = Dish.query.all()
-    if not menu_items:
-        return 'Nenhum item de menu encontrado.'
-    return render_template('index.html', restaurant=restaurants[0], menu_items=menu_items)
+    submenus = submenu.query.all()
+    return render_template('index.html', restaurant=restaurant, submenus=submenus)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
