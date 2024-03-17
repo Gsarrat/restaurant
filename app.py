@@ -10,6 +10,9 @@ app.config['SECRET_KEY'] = 'my_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///restaurants.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
+#nicio do Models
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -31,10 +34,7 @@ class User(UserMixin, db.Model):
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    address = db.Column(db.String(200), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    rating = db.Column(db.Float, nullable=False)
+
 
 class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,6 +62,9 @@ def init_app():
 
 with app.app_context():
     db.create_all()
+
+#Fim do Models
+
 
 @app.route('/')
 @app.route('/home')
@@ -126,12 +129,9 @@ def logout():
 def add_restaurant():
     if request.method == 'POST':
         name = request.form['name']
-        address = request.form['address']
-        phone = request.form['phone']
-        email = request.form['email']
-        rating = float(request.form['rating'])
 
-        new_restaurant = Restaurant(name=name, address=address, phone=phone, email=email, rating=rating)
+
+        new_restaurant = Restaurant(name=name)
         db.session.add(new_restaurant)
         db.session.commit()
 
@@ -146,10 +146,6 @@ def edit_restaurant(restaurant_id):
 
     if request.method == 'POST':
         restaurant.name = request.form['name']
-        restaurant.address = request.form['address']
-        restaurant.phone = request.form['phone']
-        restaurant.email= request.form['email']
-        restaurant.rating = float(request.form['rating'])
 
         db.session.commit()
 
