@@ -50,6 +50,10 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField('Confirmar senha')
     submit = SubmitField('Registrar')
 
+class sub_menu(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+
 # Define a função de carregamento do usuário
 @login_manager.user_loader
 def load_user(user_id):
@@ -65,7 +69,7 @@ with app.app_context():
 
 #Fim do Models
 
-
+#Inicio das Rotas
 @app.route('/')
 @app.route('/home')
 def index():
@@ -124,96 +128,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/restaurant/new', methods=['GET', 'POST'])
-@login_required
-def add_restaurant():
-    if request.method == 'POST':
-        name = request.form['name']
-
-
-        new_restaurant = Restaurant(name=name)
-        db.session.add(new_restaurant)
-        db.session.commit()
-
-        return redirect(url_for('index'))
-
-    return render_template('add_restaurant.html')
-
-@app.route('/restaurant/<int:restaurant_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_restaurant(restaurant_id):
-    restaurant = Restaurant.query.get_or_404(restaurant_id)
-
-    if request.method == 'POST':
-        restaurant.name = request.form['name']
-
-        db.session.commit()
-
-        return redirect(url_for('view_restaurant',restaurant_id=restaurant_id))
-
-    return render_template('edit_restaurant.html', restaurant=restaurant)
-
-@app.route('/restaurant/<int:restaurant_id>/delete', methods=['POST'])
-@login_required
-def delete_restaurant(restaurant_id):
-    restaurant = Restaurant.query.get_or_404(restaurant_id)
-    db.session.delete(restaurant)
-    db.session.commit()
-
-    return redirect(url_for('index'))
-
-@app.route('/restaurant/<int:restaurant_id>')
-@login_required
-def view_restaurant(restaurant_id):
-    restaurant = Restaurant.query.get_or_404(restaurant_id)
-    menu_items = restaurant.dishes
-    return render_template('view_restaurant.html', restaurant=restaurant, menu_items=menu_items)
-
-@app.route('/restaurant/<int:restaurant_id>/dishes/new', methods=['GET', 'POST'])
-@login_required
-def add_dish(restaurant_id):
-    restaurant = Restaurant.query.get_or_404(restaurant_id)
-
-    if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
-        price = float(request.form['price'])
-        available = bool(int(request.form['available']))
-
-        new_dish = Dish(name=name, description=description, price=price, available=available, restaurant=restaurant)
-        db.session.add(new_dish)
-        db.session.commit()
-
-        return redirect(url_for('view_restaurant', restaurant_id=restaurant_id))
-
-    return render_template('add_dish.html', restaurant=restaurant)
-
-@app.route('/restaurant/<int:restaurant_id>/dishes/<int:dish_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_dish(restaurant_id, dish_id):
-    restaurant = Restaurant.query.get_or_404(restaurant_id)
-    dish = Dish.query.get_or_404(dish_id)
-
-    if request.method == 'POST':
-        dish.name= request.form['name']
-        dish.description = request.form['description']
-        dish.price = float(request.form['price'])
-        dish.available = bool(int(request.form['available']))
-
-        db.session.commit()
-
-        return redirect(url_for('view_restaurant', restaurant_id=restaurant_id))
-
-    return render_template('edit_dish.html', restaurant=restaurant, dish=dish)
-
-@app.route('/restaurant/<int:restaurant_id>/dishes/<int:dish_id>/delete', methods=['POST'])
-@login_required
-def delete_dish(restaurant_id, dish_id):
-    dish = Dish.query.get_or_404(dish_id)
-    db.session.delete(dish)
-    db.session.commit()
-
-    return redirect(url_for('view_restaurant', restaurant_id=restaurant_id))
+#Fim de Rotas
 
 if __name__ == '__main__':
     init_app()
